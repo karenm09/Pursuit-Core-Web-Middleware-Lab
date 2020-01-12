@@ -6,6 +6,8 @@ document.addEventListener("DOMContentLoaded", () => {
    dequeueBtn();
 })
 
+let url = "http://localhost:8000/queue"
+
 const animalBtn = () => {
    let btn = document.querySelector("button");
    btn.addEventListener("click", verifyAnimal)
@@ -31,19 +33,27 @@ const dequeueBtn = () => {
    btn.addEventListener("click", actionDequeue)
 }
 
-const actionPeek = async () => {
+const verifyAnimal = async () => {
+   let input = document.querySelector('input');
    try {
-      let res = await axios.get(`http://localhost:8000/queue/peek`);
-      debugger
-      let h3 = document.querySelector('h3');
-      h3.innerHTML = "";
-
+      let res = await axios.get(`http://localhost:8000/animal/${input.value.toLowerCase()}`)
+      input.value = ""
+      let h2 = document.querySelector('#verify');
+      if(h2) {
+         h2.innerHTML = "";
+      } else {
+         h2 = document.createElement('h2');
+         document.body.appendChild(h2);
+      }
+      if(res.data.message){
+         h2.innerText = "Animal is found"
+      } else {
+         h2.innerText = "Animal is not found"
+      }
    } catch(err) {
       console.log(err)
    }
 }
-
-ç
 
 const pickRandomNum = async () => {
    let minNum = document.querySelector("#minVal")
@@ -51,11 +61,48 @@ const pickRandomNum = async () => {
 
    try {
       let res = await axios.get(`http:localhost:8000/random?floor=${minNum.value}&ceil=${maxNum.value}`)
-      let h4 = document.querySelector('h4');
-      h4.innerHTML = "";
+      let h2 = document.querySelector('#randNum');
+      h2.innerHTML = "";
 
-      h4.innerText = res.data.randPick;
+      h2.innerText = res.data.randPick;
    } catch (err) {
+      console.log(err)
+   }
+}
+
+const actionPeek = async () => {
+   try {
+      let res = await axios.get(`${url}/peek`);
+      let h2 = document.querySelector('#action');
+      h2.innerHTML = "";
+
+      h2.innerText = res.data.data
+   } catch(err) {
+      console.log(err)
+   }
+}
+
+const actionEnqueue = async () => {
+   let input = document.querySelector("#name")
+   try {
+      let res = await axios.get(`${url}/enqueue?name=${input.value}`);
+      let h2 = document.querySelector('#action');
+      h2.innerHTML = "";
+
+      h2.innerText = res.data.enqueued
+   } catch(err) {
+      console.log(err)
+   }
+}
+
+const actionDequeue = async () => {
+   try {
+      let res = await axios.get(`${url}/dequeue`);
+      let h3 = document.querySelector('h3');
+      h3.innerHTML = "";
+
+      h3.innerText = res.data.dequeued
+   } catch(err) {
       console.log(err)
    }
 }
